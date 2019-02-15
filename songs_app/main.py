@@ -8,6 +8,7 @@ from flask_pymongo import PyMongo
 
 from songs_app.config import app_config
 from songs_app.db.dao import SongsDAO
+from songs_app.errors import InvalidQueryParameter
 from songs_app.handlers import SongsHandler
 
 logger = logging.getLogger(__name__)
@@ -33,24 +34,31 @@ def configure_routes(app):
     songs_dao = SongsDAO(mongo_connection=g.mongo_db)
     songs_handler = SongsHandler(songs_dao=songs_dao)
 
-    app.add_url_rule("/songs", view_func=songs_handler.get_songs, methods=['GET'])
+    app.add_url_rule("/songs", view_func=songs_handler.get_songs_list, methods=['GET'])
     app.add_url_rule("/songs/avg/difficulty", view_func=songs_handler.get_difficulty, methods=['GET'])
     app.add_url_rule("/songs/search", view_func=songs_handler.search_songs, methods=['GET'])
     app.add_url_rule("/songs/rating", view_func=songs_handler.set_rating, methods=['POST'])
     app.add_url_rule("/songs/avg/rating/<int:song_id>", view_func=songs_handler.get_difficulty, methods=['GET'])
 
 
+def configure_custom_errors(app):
+    def handle_error(e): return json.dumps(e.to_dict())
+
+    app.register_error_handler(InvalidQueryParameter, handle_error)
+
+
 def create_app(cfg):
     # create app
     app = Flask(__name__)
     app.config.from_object(cfg)
+    # configure errors
+    configure_custom_errors(app)
 
-    # create and store db conn in app context
     with app.app_context():
+        # create and store db conn
         create_mongo(app, cfg)
         # configure app
         configure_routes(app)
-
         # upload existing data from file to db
         upload_json_data_from_file()
 

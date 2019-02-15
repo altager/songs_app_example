@@ -3,3 +3,5 @@
 ## Install
 
 ## TODO
+- improve typing
+- add custom errors
