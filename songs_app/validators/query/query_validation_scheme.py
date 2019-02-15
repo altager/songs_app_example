@@ -33,5 +33,5 @@ class ObjectIdConverter:
 
 @attrs(slots=True, frozen=True)
 class GetLimitLastId:
-    limit: Optional[int] = ib(default=30, converter=IntervalConverter(min_value=1, max_value=100))
+    limit: Optional[int] = ib(default=5, converter=IntervalConverter(min_value=1, max_value=100))
     last_id: Optional[str] = ib(default=None, converter=opt_conv(ObjectIdConverter()))

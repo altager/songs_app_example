@@ -6,7 +6,7 @@ class SongsDAO:
         # TODO: refactor
         if last_id:
             # this approach is a much faster than skip/limit
-            songs_list = self._mongo_connection.songs.find({'_id': {'$gt': last_id}}, {'_id': False}).limit(limit)
+            songs_list = self._mongo_connection.songs.find({'_id': {'$gt': last_id}}).limit(limit)
         else:
-            songs_list = self._mongo_connection.songs.find({}, {'_id': False}).limit(limit)
-        return songs_list
+            songs_list = self._mongo_connection.songs.find({}).limit(limit)
+        return list(songs_list)

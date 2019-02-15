@@ -37,4 +37,4 @@ services:
     build:
       context: .
       dockerfile: ./functests/Dockerfile
-    command: sleep
+    command: tests
