@@ -4,4 +4,5 @@
 
 ## TODO
 - improve typing
-- add custom errors
+- launch with gunicorn
+- refactor tests(somehow reuse app conf)

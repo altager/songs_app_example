@@ -21,3 +21,9 @@ class Song:
     @released.validator
     def released_validator(self, attribute, value):
         datetime.strptime(value, "%Y-%m-%d")
+
+
+@attrs(slots=True)
+class AvgDifficultyResponse:
+    average_difficulty: Decimal = ib()
+    level: int = ib()

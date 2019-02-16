@@ -3,45 +3,96 @@ from urllib.parse import urlencode
 import requests
 
 from functests.test_utils.constants import URL_PREFIX
-from functests.test_utils.helpers import replace_id
-from functests.test_utils.response_validators import Song
+from functests.test_utils.response_validators import SongResponse
 
 
-def test_get_songs_list():
+def test_get_songs_list(cleanup_db, create_document):
+    create_document({
+        "artist": "Test artist",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
     response = requests.get(URL_PREFIX + '/songs')
 
     assert response.status_code == 200
-    # check default limit
-    assert len(response.json()) == 5
-    [Song(**replace_id(doc)) for doc in response.json()]
+    assert len(response.json()) == 1
+    [SongResponse(**doc) for doc in response.json()]
 
 
-def test_get_songs_list_limit():
+def test_get_songs_list_limit(cleanup_db, create_document):
+    doc_id_1 = create_document({
+        "artist": "Test artist1",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
+    create_document({
+        "artist": "Test artist2",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
     response = requests.get(URL_PREFIX + '/songs?' + urlencode({'limit': 1}))
 
     assert response.status_code == 200
     assert len(response.json()) == 1
 
-    Song(**replace_id(response.json()[0]))
+    song_response = SongResponse(**response.json()[0])
+    assert song_response.id == doc_id_1
 
 
-def test_get_songs_list_offset_with_last_id():
-    songs_response = requests.get(URL_PREFIX + '/songs').json()
-    first_song = Song(**replace_id(songs_response[0]))
+def test_get_songs_list_offset_with_last_id(cleanup_db, create_document):
+    doc_id_1 = create_document({
+        "artist": "Test artist",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
+    doc_id_2 = create_document({
+        "artist": "Test artist2",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
+    doc_id_3 = create_document({
+        "artist": "Test artist3",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
 
-    songs_response_after_offset = requests.get(
-        URL_PREFIX + '/songs?' + urlencode({'last_id': str(first_song.id)})
-    ).json()
+    response = requests.get(
+        URL_PREFIX + '/songs?' + urlencode({'last_id': doc_id_1})
+    )
+    songs_response_ids_after_offset = [SongResponse(**doc).id for doc in response.json()]
+    assert [doc_id_2, doc_id_3] == songs_response_ids_after_offset
 
-    assert songs_response[1:] == songs_response_after_offset[:-1]
 
+def test_get_songs_list_limit_offset_with_last_id(cleanup_db, create_document):
+    doc_id_1 = create_document({
+        "artist": "Test artist",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
+    doc_id_2 = create_document({
+        "artist": "Test artist2",
+        "title": "test",
+        "difficulty": 10,
+        "level": 10,
+        "released": "2016-10-26"
+    })
 
-def test_get_songs_list_limit_offset_with_last_id():
-    songs_response = requests.get(URL_PREFIX + '/songs').json()
-    first_song = Song(**replace_id(songs_response[0]))
+    response = requests.get(
+        URL_PREFIX + '/songs?' + urlencode({'last_id': str(doc_id_1), 'limit': 1})
+    )
 
-    songs_response_after_offset = requests.get(
-        URL_PREFIX + '/songs?' + urlencode({'last_id': str(first_song.id), 'limit': 1})
-    ).json()
-
-    assert songs_response[1] == songs_response_after_offset[0]
+    assert doc_id_2 == SongResponse(**response.json()[0]).id

@@ -11,6 +11,7 @@ services:
       - SONGS_APP_DB=mongodb://songs_user:songs_pass@mongo:27017/songs_db?authSource=admin
     depends_on:
       - mongo
+      - redis
     volumes:
       - .:/app
     ports:
@@ -32,6 +33,11 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: songs_user
       ME_CONFIG_MONGODB_ADMINPASSWORD: songs_pass
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
 
   functests:
     build:
