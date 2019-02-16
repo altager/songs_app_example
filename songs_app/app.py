@@ -5,6 +5,7 @@ import ujson as json
 
 from flask import Flask, g
 from flask_pymongo import PyMongo
+from pymongo import TEXT
 from redis import Redis
 
 from songs_app.config import app_config
@@ -31,12 +32,13 @@ def upload_json_data_from_file():
         data = json.load(f)
 
     # drop previous data and insert new
-    g.mongo_db.drop_collection('songs')
+    g.mongo_db.songs.remove()
     g.mongo_db.songs.insert_many(data)
 
 
 def create_indexes():
     g.mongo_db.songs.create_index('level')
+    g.mongo_db.songs.create_index([('artist', TEXT), ('title', TEXT)])
 
 
 def configure_routes(app):
@@ -80,6 +82,8 @@ def create_app(cfg):
         configure_routes(app)
         # upload existing data from file to db
         upload_json_data_from_file()
+        # create indexes. before it we should have at least one document in db
+        create_indexes()
 
     return app
 

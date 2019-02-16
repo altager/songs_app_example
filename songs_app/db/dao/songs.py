@@ -72,3 +72,14 @@ class SongsDAO:
             cached_value = self._cache_backend.get_value(f'average_difficulty_all')
 
         return cached_value
+
+    def search_songs(self, message):
+        result = self._mongo_connection.songs.aggregate(
+            [
+                {'$match': {'$text': {'$search': message, '$caseSensitive': False}}},
+                {'$project': {'_id': 0, 'id': {'$toString': '$_id'}, 'artist': 1, 'title': 1, 'difficulty': 1,
+                              'level': 1, 'released': 1}},
+            ]
+        )
+
+        return result

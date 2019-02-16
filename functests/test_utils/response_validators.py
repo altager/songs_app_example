@@ -6,7 +6,7 @@ from bson import ObjectId
 
 
 @attrs(slots=True, frozen=True)
-class Song:
+class SongResponse:
     id: str = ib()
     artist: str = ib()
     title: str = ib()
