@@ -1,13 +1,14 @@
 import argparse
 import logging
 import os
-
 import ujson as json
+
 from flask import Flask, g
 from flask_pymongo import PyMongo
+from redis import Redis
 
 from songs_app.config import app_config
-from songs_app.db.dao import SongsDAO
+from songs_app.db.dao import SongsDAO, RedisCacheDAO
 from songs_app.errors import InvalidQueryParameter
 from songs_app.handlers import SongsHandler
 
@@ -15,9 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 def create_mongo(app, cfg):
-    app.config['MONGO_URI'] = os.environ.get('SONGS_APP_DB') if os.environ.get('SONGS_APP_DB') else cfg.get_db_url()
+    app.config['MONGO_URI'] = cfg.MONGO_URL
     client = PyMongo(app=app)
     g.mongo_db = client.db
+
+
+def create_redis(cfg):
+    g.redis = Redis(host=cfg.REDIS_HOST)
 
 
 def upload_json_data_from_file():
@@ -30,21 +35,33 @@ def upload_json_data_from_file():
     g.mongo_db.songs.insert_many(data)
 
 
+def create_indexes():
+    g.mongo_db.songs.create_index('level')
+
+
 def configure_routes(app):
-    songs_dao = SongsDAO(mongo_connection=g.mongo_db)
+    redis_cache_dao = RedisCacheDAO(redis_connection=g.redis)
+    songs_dao = SongsDAO(mongo_connection=g.mongo_db, cache_backend=redis_cache_dao)
     songs_handler = SongsHandler(songs_dao=songs_dao)
 
-    app.add_url_rule("/songs", view_func=songs_handler.get_songs_list, methods=['GET'])
-    app.add_url_rule("/songs/avg/difficulty", view_func=songs_handler.get_difficulty, methods=['GET'])
-    app.add_url_rule("/songs/search", view_func=songs_handler.search_songs, methods=['GET'])
-    app.add_url_rule("/songs/rating", view_func=songs_handler.set_rating, methods=['POST'])
-    app.add_url_rule("/songs/avg/rating/<int:song_id>", view_func=songs_handler.get_difficulty, methods=['GET'])
+    # we should name endpoints explicitly because of validation 'wrapper' function
+    app.add_url_rule("/songs", endpoint='get_songs_list', view_func=songs_handler.get_songs_list, methods=['GET'])
+    app.add_url_rule("/songs/avg/difficulty", endpoint='get_avg_difficulty',
+                     view_func=songs_handler.get_avg_difficulty, methods=['GET'])
+    app.add_url_rule("/songs/search", endpoint='search_songs', view_func=songs_handler.search_songs, methods=['GET'])
+    app.add_url_rule("/songs/rating", endpoint='set_rating', view_func=songs_handler.set_rating, methods=['POST'])
+    app.add_url_rule("/songs/avg/rating/<int:song_id>", endpoint='get_song_rating',
+                     view_func=songs_handler.get_song_rating, methods=['GET'])
 
 
 def configure_custom_errors(app):
     def handle_error(e): return json.dumps(e.to_dict())
 
     app.register_error_handler(InvalidQueryParameter, handle_error)
+
+
+def get_config():
+    return app_config[os.getenv('SONGS_APP_CONFIG')] if os.getenv('SONGS_APP_CONFIG') else app_config['default']
 
 
 def create_app(cfg):
@@ -57,6 +74,8 @@ def create_app(cfg):
     with app.app_context():
         # create and store db conn
         create_mongo(app, cfg)
+        # create redis for cache
+        create_redis(cfg)
         # configure app
         configure_routes(app)
         # upload existing data from file to db
@@ -71,6 +90,6 @@ if __name__ == '__main__':
     parser.add_argument('--port')
     args = parser.parse_args()
 
-    config = app_config[os.getenv('SONGS_APP_CONFIG')] if os.getenv('SONGS_APP_CONFIG') else app_config['default']
+    config = get_config()
     os.environ.setdefault('WERKZEUG_DEBUG_PIN', 'off')
-    create_app(cfg=config).run(host=args.host, port=args.port, debug=config, use_reloader=False)
+    create_app(config).run(host=args.host, port=args.port, debug=config, use_reloader=False)

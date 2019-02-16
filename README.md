@@ -4,4 +4,4 @@
 
 ## TODO
 - improve typing
-- add custom errors
+- launch with gunicorn

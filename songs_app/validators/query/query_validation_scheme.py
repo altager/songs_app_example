@@ -35,3 +35,8 @@ class ObjectIdConverter:
 class GetLimitLastId:
     limit: Optional[int] = ib(default=5, converter=IntervalConverter(min_value=1, max_value=100))
     last_id: Optional[str] = ib(default=None, converter=opt_conv(ObjectIdConverter()))
+
+
+@attrs(slots=True, frozen=True)
+class GetLevel:
+    level: Optional[int] = ib(default=None, converter=int)

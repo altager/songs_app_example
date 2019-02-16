@@ -1,6 +1,6 @@
+import ujson as json
 from datetime import datetime
 
-import ujson as json
 from bson import ObjectId
 from werkzeug.wrappers import Response
 
@@ -30,4 +30,8 @@ def json_response(data):
     if isinstance(data, dict):
         _process_doc(data)
 
-    return JSONHttpResponse(json.dumps(data))
+    # possibly we can get already dumped bytes from redis. so we dont need to dump them again
+    if not isinstance(data, bytes):
+        data = json.dumps(data)
+
+    return JSONHttpResponse(data)
