@@ -39,4 +39,4 @@ class GetLimitLastId:
 
 @attrs(slots=True, frozen=True)
 class GetLevel:
-    level: Optional[int] = ib(default=None, converter=int)
+    level: Optional[int] = ib(default=None, converter=opt_conv(int))

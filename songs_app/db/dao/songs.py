@@ -11,10 +11,22 @@ class SongsDAO:
 
     def get_songs_list(self, limit=None, last_id=None):
         if last_id:
-            # this approach is much faster than skip/limit
-            songs_list = self._mongo_connection.songs.find({'_id': {'$gt': last_id}}).limit(limit)
+            songs_list = self._mongo_connection.songs.aggregate(
+                [
+                    {'$match': {'_id': {'$gt': last_id}}},
+                    {'$project': {'_id': 0, 'id': {'$toString': '$_id'}, 'artist': 1, 'title': 1, 'difficulty': 1,
+                                  'level': 1, 'released': 1}},
+                    {'$limit': limit}
+                ]
+            )
         else:
-            songs_list = self._mongo_connection.songs.find({}).limit(limit)
+            songs_list = self._mongo_connection.songs.aggregate(
+                [
+                    {'$project': {'_id': 0, 'id': {'$toString': '$_id'}, 'artist': 1, 'title': 1, 'difficulty': 1,
+                                  'level': 1, 'released': 1}},
+                    {'$limit': limit}
+                ]
+            )
 
         return list(songs_list)
 
@@ -22,7 +34,7 @@ class SongsDAO:
         result = self._get_average_difficulty_from_cache(level=level)
         if not result:
             if level:
-                result = list(self._get_average_difficulty_from_db(level=level))
+                result = list(self._get_average_difficulty_from_db(level=level))[0]
                 self._cache_backend.upsert_value(
                     f'average_difficulty_{level}', value=json.dumps(result), expire_in=60
                 )
@@ -35,12 +47,11 @@ class SongsDAO:
         return result
 
     def _get_average_difficulty_from_db(self, level=None):
-        logger.warning('Getting from db...')
         if level:
             result = self._mongo_connection.songs.aggregate(
                 [
                     {'$match': {'level': level}},
-                    {'$group': {'_id': '$level', 'average_difficulty': {'$avg': '$difficulty'}}},
+                    {'$group': {'_id': None, 'average_difficulty': {'$avg': '$difficulty'}}},
                     {'$project': {'_id': 0, 'level': {'$literal': level}, 'average_difficulty': 1}}
                 ]
             )
@@ -49,7 +60,7 @@ class SongsDAO:
             result = self._mongo_connection.songs.aggregate(
                 [
                     {'$group': {'_id': None, 'average_difficulty': {'$avg': '$difficulty'}}},
-                    {'$project': {'_id': 0, 'level': 'all_songs', 'average_difficulty': 1}}
+                    {'$project': {'_id': 0, 'level': 'all', 'average_difficulty': 1}}
                 ]
             )
         return result
@@ -59,6 +70,5 @@ class SongsDAO:
             cached_value = self._cache_backend.get_value(f'average_difficulty_{level}')
         else:
             cached_value = self._cache_backend.get_value(f'average_difficulty_all')
-        logger.warning(cached_value)
 
         return cached_value

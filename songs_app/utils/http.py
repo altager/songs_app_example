@@ -16,20 +16,6 @@ class JSONHttpResponse(Response):
 
 # wrapper function for JSONHttpResponse
 def json_response(data):
-    def _process_doc(data):
-        if isinstance(data, dict):
-            for key in data:
-                val = data[key]
-                if isinstance(val, ObjectId) or isinstance(val, datetime):
-                    data[key] = str(val)
-
-    if isinstance(data, list):
-        for doc in data:
-            _process_doc(doc)
-
-    if isinstance(data, dict):
-        _process_doc(data)
-
     # possibly we can get already dumped bytes from redis. so we dont need to dump them again
     if not isinstance(data, bytes):
         data = json.dumps(data)

@@ -12,7 +12,7 @@ RUN pip install -r requirements.txt
 
 COPY ./functests /app/functests
 
-RUN mkdir -p /output
-VOLUME ["/output"]
+#RUN mkdir -p /output
+#VOLUME ["/output"]
 
 ENTRYPOINT ["./entrypoint.sh"]
