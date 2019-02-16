@@ -1,5 +1,6 @@
 import logging
 import ujson as json
+from songs_app.errors import DaoNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -83,3 +84,10 @@ class SongsDAO:
         )
 
         return result
+
+    def set_rating(self, song_id, rating):
+        if not self._mongo_connection.songs.find_one({'_id': song_id}):
+            raise DaoNotFound
+        self._mongo_connection.songs_rating.insert_one(
+            {'song_id': song_id, 'rating': rating}
+        )

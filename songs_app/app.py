@@ -10,7 +10,7 @@ from redis import Redis
 
 from songs_app.config import app_config
 from songs_app.db.dao import SongsDAO, RedisCacheDAO
-from songs_app.errors import InvalidQueryParameter
+from songs_app.errors import InvalidQueryParameterError, SongNotFoundError, InvalidRequestParameterError
 from songs_app.handlers import SongsHandler
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,8 @@ def upload_json_data_from_file():
         data = json.load(f)
 
     # drop previous data and insert new
-    g.mongo_db.songs.remove()
+    g.mongo_db.songs.delete_many({})
+    g.mongo_db.songs_rating.delete_many({})
     g.mongo_db.songs.insert_many(data)
 
 
@@ -59,7 +60,9 @@ def configure_routes(app):
 def configure_custom_errors(app):
     def handle_error(e): return json.dumps(e.to_dict())
 
-    app.register_error_handler(InvalidQueryParameter, handle_error)
+    app.register_error_handler(InvalidQueryParameterError, handle_error)
+    app.register_error_handler(InvalidRequestParameterError, handle_error)
+    app.register_error_handler(SongNotFoundError, handle_error)
 
 
 def get_config():

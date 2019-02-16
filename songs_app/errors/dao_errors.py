@@ -1,0 +1,2 @@
+class DaoNotFound(Exception):
+    pass
