@@ -20,7 +20,7 @@ def db():
 
 @pytest.fixture
 def cleanup_db(db):
-    db.drop_collection('songs')
+    db.songs.remove()
 
 
 @pytest.fixture(scope='session')
