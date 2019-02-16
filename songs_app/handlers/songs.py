@@ -1,6 +1,8 @@
 from songs_app.db.dao import SongsDAO
 from songs_app.utils import json_response
 from songs_app.validators.query import query_validator, GetLimitLastId, GetLevel, Search
+from songs_app.validators.request import request_validator, CreateRating
+from songs_app.errors import DaoNotFound, SongNotFoundError
 
 
 class SongsHandler:
@@ -22,8 +24,13 @@ class SongsHandler:
         search_result = self._songs_dao.search_songs(message=query_data.message)
         return json_response(search_result)
 
-    def set_rating(self):
-        pass
+    @request_validator(CreateRating)
+    def set_rating(self, query_data: CreateRating):
+        try:
+            self._songs_dao.set_rating(song_id=query_data.song_id, rating=query_data.rating)
+        except DaoNotFound:
+            raise SongNotFoundError
+        return json_response(b'', 201)
 
     def get_song_rating(self):
         pass

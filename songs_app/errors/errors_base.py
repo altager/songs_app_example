@@ -1,12 +1,8 @@
-class JsonHttpError(Exception):
-    def __init__(self, message, status_code, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
+from werkzeug.exceptions import HTTPException
 
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
+from songs_app.utils import json_response
+
+
+class JsonHttpError(HTTPException):
+    def __init__(self, message, status_code):
+        super().__init__(self, response=json_response({'message': message}, status=status_code))

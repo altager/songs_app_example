@@ -27,3 +27,8 @@ class SongResponse:
 class AvgDifficultyResponse:
     average_difficulty: Decimal = ib()
     level: int = ib()
+
+
+@attrs(slots=True)
+class ErrorResponse:
+    message: str = ib()

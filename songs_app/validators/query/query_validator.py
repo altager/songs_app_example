@@ -4,7 +4,7 @@ from typing import Callable, Any
 from flask import request
 from werkzeug.datastructures import ImmutableMultiDict
 
-from songs_app.errors import InvalidQueryParameter
+from songs_app.errors import InvalidQueryParameterError
 
 logger = logging.getLogger(__name__)
 
@@ -12,9 +12,8 @@ logger = logging.getLogger(__name__)
 def _schema_validation(schema: Callable, request_data: ImmutableMultiDict):
     try:
         query_data = schema(**request_data.to_dict())
-    except (TypeError, ValueError) as exc:
-        logger.debug(f'Query validation error: {exc}')
-        raise InvalidQueryParameter
+    except (TypeError, ValueError):
+        raise InvalidQueryParameterError
 
     return query_data
 

@@ -1,7 +1,5 @@
 import ujson as json
-from datetime import datetime
 
-from bson import ObjectId
 from werkzeug.wrappers import Response
 
 
@@ -15,9 +13,9 @@ class JSONHttpResponse(Response):
 
 
 # wrapper function for JSONHttpResponse
-def json_response(data):
+def json_response(data, status=200):
     # possibly we can get already dumped bytes from redis. so we dont need to dump them again
     if not isinstance(data, bytes):
         data = json.dumps(data)
 
-    return JSONHttpResponse(data)
+    return JSONHttpResponse(data, status=status)
