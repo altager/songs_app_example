@@ -1,3 +1,3 @@
 from .songs import SongsHandler
 
-__all__ = ('SongsHandler',)
+__all__ = ("SongsHandler",)

@@ -10,4 +10,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__)))
 from functests.test_utils.data_fixtures import *  # noqa
 from functests.test_utils.common_fixtures import *  # noqa
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)-1s [%(name)s] %(levelname)s %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)-1s [%(name)s] %(levelname)s %(message)s"
+)

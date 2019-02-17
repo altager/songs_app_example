@@ -6,14 +6,16 @@ from functests.test_utils.response_validators import SongResponse
 
 
 def test_get_songs_list(cleanup_db, create_document, cfg):
-    create_document({
-        "artist": "Test artist",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    response = requests.get(cfg.URL_PREFIX + '/songs')
+    create_document(
+        {
+            "artist": "Test artist",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    response = requests.get(cfg.URL_PREFIX + "/songs")
 
     assert response.status_code == 200
     assert len(response.json()) == 1
@@ -21,21 +23,25 @@ def test_get_songs_list(cleanup_db, create_document, cfg):
 
 
 def test_get_songs_list_limit(cleanup_db, create_document, cfg):
-    doc_id_1 = create_document({
-        "artist": "Test artist1",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    create_document({
-        "artist": "Test artist2",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    response = requests.get(cfg.URL_PREFIX + '/songs?' + urlencode({'limit': 1}))
+    doc_id_1 = create_document(
+        {
+            "artist": "Test artist1",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    create_document(
+        {
+            "artist": "Test artist2",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    response = requests.get(cfg.URL_PREFIX + "/songs?" + urlencode({"limit": 1}))
 
     assert response.status_code == 200
     assert len(response.json()) == 1
@@ -45,60 +51,72 @@ def test_get_songs_list_limit(cleanup_db, create_document, cfg):
 
 
 def test_get_songs_list_offset_with_last_id(cleanup_db, create_document, cfg):
-    doc_id_1 = create_document({
-        "artist": "Test artist",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    doc_id_2 = create_document({
-        "artist": "Test artist2",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    doc_id_3 = create_document({
-        "artist": "Test artist3",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
+    doc_id_1 = create_document(
+        {
+            "artist": "Test artist",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    doc_id_2 = create_document(
+        {
+            "artist": "Test artist2",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    doc_id_3 = create_document(
+        {
+            "artist": "Test artist3",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
 
     response = requests.get(
-        cfg.URL_PREFIX + '/songs?' + urlencode({'last_id': doc_id_1})
+        cfg.URL_PREFIX + "/songs?" + urlencode({"last_id": doc_id_1})
     )
-    songs_response_ids_after_offset = [SongResponse(**doc).id for doc in response.json()]
+    songs_response_ids_after_offset = [
+        SongResponse(**doc).id for doc in response.json()
+    ]
     assert [doc_id_2, doc_id_3] == songs_response_ids_after_offset
 
 
 def test_get_songs_list_limit_offset_with_last_id(cleanup_db, create_document, cfg):
-    doc_id_1 = create_document({
-        "artist": "Test artist",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
-    doc_id_2 = create_document({
-        "artist": "Test artist2",
-        "title": "test",
-        "difficulty": 10,
-        "level": 10,
-        "released": "2016-10-26"
-    })
+    doc_id_1 = create_document(
+        {
+            "artist": "Test artist",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
+    doc_id_2 = create_document(
+        {
+            "artist": "Test artist2",
+            "title": "test",
+            "difficulty": 10,
+            "level": 10,
+            "released": "2016-10-26",
+        }
+    )
 
     response = requests.get(
-        cfg.URL_PREFIX + '/songs?' + urlencode({'last_id': str(doc_id_1), 'limit': 1})
+        cfg.URL_PREFIX + "/songs?" + urlencode({"last_id": str(doc_id_1), "limit": 1})
     )
 
     assert doc_id_2 == SongResponse(**response.json()[0]).id
 
 
 def test_get_songs_list_empty_list(cleanup_db, cfg):
-    response = requests.get(cfg.URL_PREFIX + '/songs')
+    response = requests.get(cfg.URL_PREFIX + "/songs")
 
     assert response.status_code == 200
     assert len(response.json()) == 0

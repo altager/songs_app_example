@@ -9,7 +9,9 @@ class JSONHttpResponse(Response):
     """
 
     def __init__(self, response=None, status=None):
-        super().__init__(response=response, content_type='application/json', status=status)
+        super().__init__(
+            response=response, content_type="application/json", status=status
+        )
 
 
 # wrapper function for JSONHttpResponse
