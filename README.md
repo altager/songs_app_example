@@ -24,12 +24,13 @@ export SONGS_APP_CONFIG=default TEST_CONFIG=default
 3. Create venv or/and install dependencies from requirements.txt
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
+pip install -r ./functests/requirements.txt
 ```
 4. Run application (with python3.*). Run --help if needed
 
 ```
-python main.py
+python main.py --host localhost --port 8080
 ```
 5. (Optionally) Run tests from ./functests directory
 
