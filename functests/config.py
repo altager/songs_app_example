@@ -13,6 +13,12 @@ class DefaultTestConfig:
     REDIS_URL = os.environ.get('REDIS_URL') or f'redis://{REDIS_HOST}:6379/'
 
 
-class DockerDebugTestConfig(DefaultTestConfig):
+class DockerTestConfig(DefaultTestConfig):
     MONGO_HOST = 'mongo'
     REDIS_HOST = 'redis'
+
+
+app_config = {
+    'default': DefaultTestConfig,
+    'docker_debug': DockerTestConfig,
+}

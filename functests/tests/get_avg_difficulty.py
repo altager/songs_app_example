@@ -60,5 +60,5 @@ def test_get_avg_difficulty_for_specific_level(cleanup_cache, create_document, c
 
     assert response.status_code == 200
     avg_diff = AvgDifficultyResponse(**response.json())
-    assert (7 + 3) / 2 == avg_diff.average_difficulty
+    assert (4 + 3) / 2 == avg_diff.average_difficulty
     assert 9 == avg_diff.level
