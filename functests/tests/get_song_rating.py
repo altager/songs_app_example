@@ -1,10 +1,9 @@
 import requests
 
-from functests.test_utils.constants import URL_PREFIX
 from functests.test_utils.response_validators import AvgRatingResponse, ErrorResponse
 
 
-def test_get_song_rating(create_document, set_song_rating):
+def test_get_song_rating(create_document, set_song_rating, cfg):
     doc_id = create_document({
         "artist": "Test artist",
         "title": "test",
@@ -16,7 +15,7 @@ def test_get_song_rating(create_document, set_song_rating):
     set_song_rating(doc_id, 4)
     set_song_rating(doc_id, 3)
 
-    response = requests.get(URL_PREFIX + f'/songs/avg/rating/{doc_id}')
+    response = requests.get(cfg.URL_PREFIX + f'/songs/avg/rating/{doc_id}')
 
     assert response.status_code == 200
     song_rating = AvgRatingResponse(**response.json())
@@ -27,17 +26,17 @@ def test_get_song_rating(create_document, set_song_rating):
     assert 4 == song_rating.max
 
 
-def test_get_song_rating_song_not_found():
+def test_get_song_rating_song_not_found(cfg):
     song_id = '000000000000000000000000'
 
-    response = requests.get(URL_PREFIX + f'/songs/avg/rating/{song_id}')
+    response = requests.get(cfg.URL_PREFIX + f'/songs/avg/rating/{song_id}')
 
     assert response.status_code == 404
     error = ErrorResponse(**response.json())
     assert error.message == 'song_not_found'
 
 
-def test_get_song_rating_empty_rating(create_document):
+def test_get_song_rating_empty_rating(create_document, cfg):
     doc_id = create_document({
         "artist": "Test artist",
         "title": "test",
@@ -46,7 +45,7 @@ def test_get_song_rating_empty_rating(create_document):
         "released": "2016-10-26"
     })
 
-    response = requests.get(URL_PREFIX + f'/songs/avg/rating/{doc_id}')
+    response = requests.get(cfg.URL_PREFIX + f'/songs/avg/rating/{doc_id}')
 
     assert response.status_code == 200
     assert response.json() == {}

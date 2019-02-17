@@ -28,18 +28,32 @@ class DefaultConfig:
     MONGO_HOST = 'localhost'
     MONGO_PORT = '27017'
     MONGO_DATABASE_NAME = 'songs_db'
-    MONGO_URL = os.environ.get('SONGS_APP_DB') or \
-                f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DATABASE_NAME}?authSource=admin'
     REDIS_HOST = 'localhost'
-    REDIS_URL = os.environ.get('REDIS_URL') or f'redis://{REDIS_HOST}:6379/'
+    UPLOAD_SAMPLE_DATA = os.environ.get('UPLOAD_SAMPLE_DATA') or True
+    LOGGER_FORMAT = '[%(asctime)s] [%(name)s] [%(levelname)s]  %(message)s'
+    LOGGER_LEVEL = 10  # CRITICAL=50, ERROR=40, WARNING=30, INFO=20, DEBUG=10, NOTSET=0
 
 
 class DockerDebugConfig(DefaultConfig):
     MONGO_HOST = 'mongo'
     REDIS_HOST = 'redis'
+    LOGGER_LEVEL = 10
+
+
+def get_mongo_db_url(cfg):
+    return os.environ.get('SONGS_APP_DB') or \
+           f'mongodb://{cfg.MONGO_USER}:{cfg.MONGO_PASS}@{cfg.MONGO_HOST}:' \
+               f'{cfg.MONGO_PORT}/{cfg.MONGO_DATABASE_NAME}?authSource=admin'
+
+
+class DockerProdConfig(DockerDebugConfig):
+    # How it could be in real
+    DEBUG = False
+    LOGGER_LEVEL = 40
 
 
 app_config = {
     'default': DefaultConfig,
     'docker_debug': DockerDebugConfig,
+    'docker_prod': DockerProdConfig
 }

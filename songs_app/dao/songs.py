@@ -36,15 +36,19 @@ class SongsDAO:
         result = self._get_average_difficulty_from_cache(level=level)
         if not result:
             if level:
-                result = list(self._get_average_difficulty_from_db(level=level))[0]
-                self._cache_backend.upsert_value(
-                    f'average_difficulty_{level}', value=json.dumps(result), expire_in=60
-                )
+                result = list(self._get_average_difficulty_from_db(level=level))
+                result = result[0] if result else {}
+                if result:
+                    self._cache_backend.upsert_value(
+                        f'average_difficulty_{level}', value=json.dumps(result), expire_in=60
+                    )
             else:
-                result = list(self._get_average_difficulty_from_db())[0]
-                self._cache_backend.upsert_value(
-                    'average_difficulty_all', value=json.dumps(result), expire_in=60
-                )
+                result = list(self._get_average_difficulty_from_db())
+                result = result[0] if result else {}
+                if result:
+                    self._cache_backend.upsert_value(
+                        'average_difficulty_all', value=json.dumps(result), expire_in=60
+                    )
 
         return result
 

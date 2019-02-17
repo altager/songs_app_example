@@ -1,4 +1,4 @@
-from songs_app.db.dao import SongsDAO
+from songs_app.dao import SongsDAO
 from songs_app.errors import DaoNotFound, SongNotFoundError
 from songs_app.utils import json_response
 from songs_app.validators.query import query_validator, GetLimitLastId, GetLevel, Search

@@ -2,12 +2,14 @@
 set -e
 
 ./bin/wait-for-it.sh mongo:27017 -t 25
+./bin/wait-for-it.sh redis:6379 -t 25
 
 if [[ $1 = 'app' ]]; then
-    python -m songs_app.app --host 0.0.0.0 --port 8080
+    gunicorn --bind 0.0.0.0:8080 songs_app.main:app
 fi
 
 if [[ $1 = 'tests' ]]; then
+    ./bin/wait-for-it.sh songs_app:8080 -t 25
     pytest --spec -p no:cacheprovider --tb short -vv .
 fi
 

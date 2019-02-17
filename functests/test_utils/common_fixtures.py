@@ -4,10 +4,10 @@ import pymongo
 import pytest
 from redis import Redis
 
-from functests.config import app_config
+from functests.config import app_config, get_mongo_db_url
 
 __all__ = [
-    'config',
+    'cfg',
     'db',
     'cleanup_db',
     'redis',
@@ -16,13 +16,13 @@ __all__ = [
 
 
 @pytest.fixture(scope='session')
-def config():
-    return app_config[os.getenv('SONGS_APP_CONFIG')] if os.getenv('SONGS_APP_CONFIG') else app_config['default']
+def cfg():
+    return app_config[os.getenv('TEST_CONFIG')] if os.getenv('TEST_CONFIG') else app_config['default']
 
 
 @pytest.fixture(scope='session')
-def db(config):
-    client = pymongo.MongoClient(config.MONGO_URL)
+def db(cfg):
+    client = pymongo.MongoClient(get_mongo_db_url(cfg))
     return client.songs_db
 
 
@@ -32,8 +32,8 @@ def cleanup_db(db):
 
 
 @pytest.fixture(scope='session')
-def redis(config):
-    return Redis(host=config.REDIS_HOST)
+def redis(cfg):
+    return Redis(host=cfg.REDIS_HOST)
 
 
 @pytest.fixture()
