@@ -6,30 +6,42 @@ Simple API example with Flask, MongoDB, Redis.
 ### With Docker
 Execute everything in containers (tests also will be executed in standalone container)
 
-``` docker-compose -f docker-compose.yml up -d ```
+``` 
+docker-compose -f docker-compose.yml up -d 
+```
 
 ### Locally
 1. Run dependencies in docker
 
-```docker-compose -f docker-compose.deps.yml up -d ```
+```
+docker-compose -f docker-compose.deps.yml up -d 
+```
 2. Set environment variables for app and tests (default or prod)
 
-```export SONGS_APP_CONFIG=default TEST_CONFIG=default```
+```
+export SONGS_APP_CONFIG=default TEST_CONFIG=default
+```
 3. Create venv or/and install dependencies from requirements.txt
 
-```pip install requirements.txt```
+```
+pip install requirements.txt
+```
 4. Run application (with python3.*). Run --help if needed
 
-```python main.py```
+```
+python main.py
+```
 5. (Optionally) Run tests from ./functests directory
 
-```pytest```
+```
+pytest
+```
 
 ## Features
 - Request (query, body) validation with attrs.
 - Custom json response errors (i.e SongNotFoundError and so on)
-- Caching for 'songs avg difficulty' and 'rating' with Redis
-- Docker deployment
+- Caching support for 'songs avg difficulty' and 'rating' with Redis
+- docker/docker-compose
 - Standalone functional (integration) tests with pytest
 - MongoDB text indexes for songs searching (better to do with Elastic in future)
 - TODO: add pipenv
@@ -39,7 +51,3 @@ Execute everything in containers (tests also will be executed in standalone cont
 - TODO: cron tasks for calculation methods (idk if its needed at this time)
 - TODO Log into file
 - TODO: add sharding etc
-
-## Project structure overview
-./main.py -> main app file, entrypoint
-./dao -> DAOs
