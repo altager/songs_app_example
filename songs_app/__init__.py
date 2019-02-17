@@ -64,7 +64,7 @@ def configure_routes(app):
     songs_dao = SongsDAO(mongo_connection=g.mongo_db, cache_backend=redis_cache_dao)
     songs_handler = SongsHandler(songs_dao=songs_dao)
 
-    # we should name endpoints explicitly because of validation 'wrapper' function
+    # we should name endpoints explicitly because we use validation decorator
     app.add_url_rule("/songs", endpoint='get_songs_list', view_func=songs_handler.get_songs_list, methods=['GET'])
     app.add_url_rule("/songs/avg/difficulty", endpoint='get_avg_difficulty',
                      view_func=songs_handler.get_avg_difficulty, methods=['GET'])

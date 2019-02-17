@@ -1,5 +1,5 @@
 # Songs application
-Simple API example with Flask, MongoDB, Redis. 
+Simple API example with Flask, MongoDB, Redis(cache). 
 
 ## Install
 
@@ -16,10 +16,16 @@ docker-compose -f docker-compose.yml up -d
 ```
 docker-compose -f docker-compose.deps.yml up -d 
 ```
-2. Set environment variables for app and tests (default or prod)
+2. Set up environment variables for app and tests (default or prod)
 
 ```
 export SONGS_APP_CONFIG=default TEST_CONFIG=default
+```
+(Optionally) If you want you can override some variables
+
+```
+UPLOAD_SAMPLE_DATA=True - upload sample data from songs_app/sample_data/songs.json (default True)
+SONGS_APP_DB - full url for mongodb connection. Example: mongodb://user:pass@host:port/db_name?authSource=admin
 ```
 3. Create venv or/and install dependencies from requirements.txt
 
