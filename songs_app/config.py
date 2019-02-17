@@ -32,6 +32,8 @@ class DefaultConfig:
     UPLOAD_SAMPLE_DATA = os.environ.get('UPLOAD_SAMPLE_DATA') or True
     LOGGER_FORMAT = '[%(asctime)s] [%(name)s] [%(levelname)s]  %(message)s'
     LOGGER_LEVEL = 10  # CRITICAL=50, ERROR=40, WARNING=30, INFO=20, DEBUG=10, NOTSET=0
+    CACHE_TTL_DIFFICULTY = 60
+    CACHE_TTL_RATING = 60
 
 
 class DockerDebugConfig(DefaultConfig):

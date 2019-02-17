@@ -59,9 +59,14 @@ def configure_converters(app):
     app.url_map.converters['object_id'] = ObjectIdURLConverter
 
 
-def configure_routes(app):
+def configure_routes(app, cfg):
     redis_cache_dao = RedisCacheDAO(redis_connection=g.redis)
-    songs_dao = SongsDAO(mongo_connection=g.mongo_db, cache_backend=redis_cache_dao)
+    songs_dao = SongsDAO(
+        mongo_connection=g.mongo_db,
+        cache_backend=redis_cache_dao,
+        cache_ttl_difficulty=cfg.CACHE_TTL_DIFFICULTY,
+        cache_ttl_rating=cfg.CACHE_TTL_RATING
+    )
     songs_handler = SongsHandler(songs_dao=songs_dao)
 
     # we should name endpoints explicitly because we use validation decorator
@@ -107,7 +112,7 @@ def create_app(cfg):
         # create redis for cache
         create_redis(cfg)
         # configure app
-        configure_routes(app)
+        configure_routes(app, cfg)
         if cfg.UPLOAD_SAMPLE_DATA:
             # upload existing data from file to db
             upload_json_data_from_file()
