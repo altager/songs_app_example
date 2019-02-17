@@ -7,8 +7,7 @@ services:
     environment:
       - PYTHONPATH=/app
       - ROOT_PATH=/app
-      - SONGS_APP_CONFIG=docker_debug
-      - SONGS_APP_DB=mongodb://songs_user:songs_pass@mongo:27017/songs_db?authSource=admin
+      - SONGS_APP_CONFIG=docker_prod
     depends_on:
       - mongo
       - redis
@@ -43,4 +42,6 @@ services:
     build:
       context: .
       dockerfile: ./functests/Dockerfile
+    environment:
+      - TEST_CONFIG=docker
     command: tests

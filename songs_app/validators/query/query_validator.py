@@ -13,6 +13,7 @@ def _schema_validation(schema: Callable, request_data: ImmutableMultiDict):
     try:
         query_data = schema(**request_data.to_dict())
     except (TypeError, ValueError):
+        logger.debug(f"Query validation error")
         raise InvalidQueryParameterError
 
     return query_data

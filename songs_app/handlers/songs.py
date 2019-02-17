@@ -1,4 +1,4 @@
-from songs_app.db.dao import SongsDAO
+from songs_app.dao import SongsDAO
 from songs_app.errors import DaoNotFound, SongNotFoundError
 from songs_app.utils import json_response
 from songs_app.validators.query import query_validator, GetLimitLastId, GetLevel, Search
@@ -11,7 +11,9 @@ class SongsHandler:
 
     @query_validator(GetLimitLastId)
     def get_songs_list(self, query_data: GetLimitLastId):
-        songs_list = self._songs_dao.get_songs_list(limit=query_data.limit, last_id=query_data.last_id)
+        songs_list = self._songs_dao.get_songs_list(
+            limit=query_data.limit, last_id=query_data.last_id
+        )
         return json_response(songs_list)
 
     @query_validator(GetLevel)
@@ -27,10 +29,12 @@ class SongsHandler:
     @request_validator(CreateRating)
     def set_rating(self, query_data: CreateRating):
         try:
-            self._songs_dao.set_rating(song_id=query_data.song_id, rating=query_data.rating)
+            self._songs_dao.set_rating(
+                song_id=query_data.song_id, rating=query_data.rating
+            )
         except DaoNotFound:
             raise SongNotFoundError
-        return json_response(b'', 201)
+        return json_response(b"", 201)
 
     def get_song_rating(self, song_id):
         try:

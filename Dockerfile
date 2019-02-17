@@ -15,6 +15,5 @@ RUN apt-get update \
 COPY . /app
 RUN python setup.py install
 
-# TODO: move host and port to env var
 EXPOSE 8080
 ENTRYPOINT ["./entrypoint.sh"]

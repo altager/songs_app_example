@@ -1,5 +1,5 @@
 import bson
-from attr import attrs
+from attr import attrs, ib
 from werkzeug.routing import BaseConverter
 
 from songs_app.errors import SongNotFoundError
@@ -25,3 +25,20 @@ class ObjectIdURLConverter(BaseConverter):
 
     def to_url(self, value):
         return str(value)
+
+
+@attrs(repr=False, slots=True)
+class IntervalConverter:
+    min_value = ib(default=0)
+    max_value = ib(default=None)
+
+    def __call__(self, value):
+
+        value = int(value)
+
+        if self.min_value is not None:
+            value = self.min_value if value < self.min_value else value
+        elif self.max_value is not None:
+            value = self.max_value if value > self.max_value else value
+
+        return value
