@@ -12,6 +12,7 @@ from songs_app.config import app_config
 from songs_app.db.dao import SongsDAO, RedisCacheDAO
 from songs_app.errors import InvalidQueryParameterError, SongNotFoundError, InvalidRequestParameterError
 from songs_app.handlers import SongsHandler
+from songs_app.validators.common import ObjectIdURLConverter
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,10 @@ def create_indexes():
     g.mongo_db.songs.create_index([('artist', TEXT), ('title', TEXT)])
 
 
+def configure_converters(app):
+    app.url_map.converters['object_id'] = ObjectIdURLConverter
+
+
 def configure_routes(app):
     redis_cache_dao = RedisCacheDAO(redis_connection=g.redis)
     songs_dao = SongsDAO(mongo_connection=g.mongo_db, cache_backend=redis_cache_dao)
@@ -53,7 +58,7 @@ def configure_routes(app):
                      view_func=songs_handler.get_avg_difficulty, methods=['GET'])
     app.add_url_rule("/songs/search", endpoint='search_songs', view_func=songs_handler.search_songs, methods=['GET'])
     app.add_url_rule("/songs/rating", endpoint='set_rating', view_func=songs_handler.set_rating, methods=['POST'])
-    app.add_url_rule("/songs/avg/rating/<int:song_id>", endpoint='get_song_rating',
+    app.add_url_rule("/songs/avg/rating/<object_id:song_id>", endpoint='get_song_rating',
                      view_func=songs_handler.get_song_rating, methods=['GET'])
 
 
@@ -75,18 +80,20 @@ def create_app(cfg):
     app.config.from_object(cfg)
     # configure errors
     configure_custom_errors(app)
+    # configure custom url converters
+    configure_converters(app)
 
     with app.app_context():
         # create and store db conn
         create_mongo(app, cfg)
+        # create indexes
+        create_indexes()
         # create redis for cache
         create_redis(cfg)
         # configure app
         configure_routes(app)
         # upload existing data from file to db
-        upload_json_data_from_file()
-        # create indexes. before it we should have at least one document in db
-        create_indexes()
+        # upload_json_data_from_file()
 
     return app
 

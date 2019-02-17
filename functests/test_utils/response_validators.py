@@ -32,3 +32,15 @@ class AvgDifficultyResponse:
 @attrs(slots=True)
 class ErrorResponse:
     message: str = ib()
+
+
+@attrs(slots=True)
+class AvgRatingResponse:
+    avg_rating: Decimal = ib()
+    min: int = ib()
+    max: int = ib()
+    song_id: str = ib()
+
+    @song_id.validator
+    def id_validator(self, attribute, value):
+        ObjectId(value)

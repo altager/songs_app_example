@@ -1,5 +1,6 @@
 import logging
 import ujson as json
+
 from songs_app.errors import DaoNotFound
 
 logger = logging.getLogger(__name__)
@@ -88,6 +89,47 @@ class SongsDAO:
     def set_rating(self, song_id, rating):
         if not self._mongo_connection.songs.find_one({'_id': song_id}):
             raise DaoNotFound
+
         self._mongo_connection.songs_rating.insert_one(
             {'song_id': song_id, 'rating': rating}
         )
+
+    def get_rating(self, song_id):
+        if not self._mongo_connection.songs.find_one({'_id': song_id}):
+            raise DaoNotFound
+
+        result = self._get_song_rating_from_cache(song_id=str(song_id))
+        if not result:
+            result = list(self._get_song_rating_from_db(song_id=song_id))
+            result = result[0] if result else {}
+            if result:
+                self._cache_backend.upsert_value(
+                    f'song_rating_{str(song_id)}', value=json.dumps(result), expire_in=60
+                )
+
+        return result
+
+    def _get_song_rating_from_db(self, song_id=None):
+        if song_id:
+            result = self._mongo_connection.songs_rating.aggregate(
+                [
+                    {'$match': {'song_id': song_id}},
+                    {'$group': {'_id': None, 'avg_rating': {'$avg': '$rating'}, 'min': {'$min': '$rating'},
+                                'max': {'$max': '$rating'}}},
+                    {'$project': {'_id': 0, 'song_id': {'$toString': song_id}, 'avg_rating': 1, 'max': 1, 'min': 1}}
+                ]
+            )
+        else:
+            result = self._mongo_connection.songs_rating.aggregate(
+                [
+                    {'$group': {'_id': '$song_id', 'avg_rating': {'$avg': '$rating'}, 'min': {'$min': '$rating'},
+                                'max': {'$max': '$rating'}}}
+                ]
+            )
+
+        return result
+
+    def _get_song_rating_from_cache(self, song_id):
+        cached_value = self._cache_backend.get_value(f'song_rating_{song_id}')
+
+        return cached_value

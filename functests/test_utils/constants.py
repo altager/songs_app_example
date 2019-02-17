@@ -1,1 +1,1 @@
-URL_PREFIX = "http://localhost:5000"
+URL_PREFIX = "http://songs_app:8080"

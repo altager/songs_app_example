@@ -4,7 +4,7 @@ set -e
 ./bin/wait-for-it.sh mongo:27017 -t 25
 
 if [[ $1 = 'app' ]]; then
-    python -m songs_app.main --host 0.0.0.0 --port 8080
+    python -m songs_app.app --host 0.0.0.0 --port 8080
 fi
 
 if [[ $1 = 'tests' ]]; then

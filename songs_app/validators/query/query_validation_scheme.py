@@ -1,8 +1,9 @@
 from typing import Optional
 
-import bson
 from attr import attrs, attrib, ib
 from attr.converters import optional as opt_conv
+
+from songs_app.validators.common import ObjectIdConverter
 
 
 @attrs(repr=False, slots=True)
@@ -20,15 +21,6 @@ class IntervalConverter:
             value = self.max_value if value > self.max_value else value
 
         return value
-
-
-@attrs(repr=False, slots=True)
-class ObjectIdConverter:
-    def __call__(self, value):
-        try:
-            return bson.ObjectId(value)
-        except bson.errors.InvalidId:
-            raise ValueError
 
 
 @attrs(slots=True, frozen=True)
