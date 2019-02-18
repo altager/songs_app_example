@@ -11,8 +11,6 @@ services:
     depends_on:
       - mongo
       - redis
-    volumes:
-      - .:/app
     ports:
       - 8080:8080
     command: app

@@ -4,6 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /app/functests
 
+# relatively to context. not to this dir
 COPY ./bin ./bin
 COPY ./functests/requirements.txt .
 COPY ./entrypoint.sh .
