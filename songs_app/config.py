@@ -29,7 +29,7 @@ class DefaultConfig:
     MONGO_PORT = "27017"
     MONGO_DATABASE_NAME = "songs_db"
     REDIS_HOST = "localhost"
-    UPLOAD_SAMPLE_DATA = os.environ.get("UPLOAD_SAMPLE_DATA") or True
+    UPLOAD_SAMPLE_DATA = True
     LOGGER_FORMAT = "[%(asctime)s] [%(name)s] [%(levelname)s]  %(message)s"
     LOGGER_LEVEL = 10  # CRITICAL=50, ERROR=40, WARNING=30, INFO=20, DEBUG=10, NOTSET=0
     CACHE_TTL_DIFFICULTY = 60

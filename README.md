@@ -11,7 +11,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 
 ### Locally
-1. Run dependencies in docker
+1. Run dependencies (Mongo, Redis, Mongo express) in docker
 
 ```
 docker-compose -f docker-compose.deps.yml up -d 
@@ -21,12 +21,7 @@ docker-compose -f docker-compose.deps.yml up -d
 ```
 export SONGS_APP_CONFIG=default TEST_CONFIG=default
 ```
-(Optionally) If you want you can override some variables
 
-```
-UPLOAD_SAMPLE_DATA=True - upload sample data from songs_app/sample_data/songs.json (default True)
-SONGS_APP_DB - full url for mongodb connection. Example: mongodb://user:pass@host:port/db_name?authSource=admin
-```
 3. Create venv or/and install dependencies from requirements.txt
 
 ```
