@@ -83,7 +83,7 @@ def configure_routes(app, cfg):
     )
     songs_handler = SongsHandler(songs_dao=songs_dao)
 
-    # we should name endpoints explicitly because we use validation decorator
+    # we should set endpoints explicitly because we use validation decorator
     app.add_url_rule(
         "/songs",
         endpoint="get_songs_list",
