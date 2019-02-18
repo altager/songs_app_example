@@ -1,6 +1,7 @@
 # Songs application
 Simple API example with Flask, MongoDB, Redis(cache). 
 
+
 GET /songs
   - Returns a list of songs with some details on them
   - Default limit is 5, max limit is 100
@@ -10,6 +11,7 @@ GET /songs
     - /songs
     - /songs?limit=1
     - /songs?last_id=507f191e810c19729de860ea&limit=2
+
 
 GET /songs/avg/difficulty
   - Takes an optional parameter "level" to select only songs from a specific level.
@@ -26,7 +28,7 @@ GET /songs/search
   - Search is case insensitive
   
     Examples:
-    - /songs/search?message=Mr%20Fas
+    - /songs/search?message=Mr%20Fas  
 
 POST /songs/rating
   - Takes in parameter a "song_id" and a "rating"
@@ -34,7 +36,7 @@ POST /songs/rating
   
     Examples:
     - {"song_id": "507f191e810c19729de860ea", "rating": 1}
-     
+   
 
 GET /songs/avg/rating/<song_id>
   - Returns the average, the lowest and the highest rating of the given song id.
@@ -42,7 +44,10 @@ GET /songs/avg/rating/<song_id>
     Examples:
     - /songs/avg/rating/507f191e810c19729de860ea
 
+
 ## Install
+NOTE: Sample data from ./songs_app/sample_data.json will be uploaded automatically. 
+If you want to change this behavior - just set UPLOAD_SAMPLE_DATA to False in config.py
 
 ### With Docker
 Execute everything in containers (tests also will be executed in standalone container)
