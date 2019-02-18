@@ -6,16 +6,16 @@ GET /songs
   - Default limit is 5, max limit is 100
   - Use parameter last_id to skip everything before last_id (including last_id)
   
- Examples: 
-   - /songs
-   - /songs?limit=1
-   - /songs?last_id=507f191e810c19729de860ea&limit=2
+    Examples: 
+    - /songs
+    - /songs?limit=1
+    - /songs?last_id=507f191e810c19729de860ea&limit=2
 
 GET /songs/avg/difficulty
   - Takes an optional parameter "level" to select only songs from a specific level.
   - Returns the average difficulty for all songs.
   
-  Examples:
+    Examples:
     - /songs/avg/difficulty
     - /songs/avg/difficulty?level=9
 
@@ -25,21 +25,21 @@ GET /songs/search
   - Search by title and artist
   - Search is case insensitive
   
-  Examples:
+    Examples:
     - /songs/search?message=Mr%20Fas
 
 POST /songs/rating
   - Takes in parameter a "song_id" and a "rating"
   - This call adds a rating to the song. Ratings should be between 1 and 5
   
-  Examples:
+    Examples:
     - {"song_id": "507f191e810c19729de860ea", "rating": 1}
      
 
 GET /songs/avg/rating/<song_id>
   - Returns the average, the lowest and the highest rating of the given song id.
   
-  Examples:
+    Examples:
     - /songs/avg/rating/507f191e810c19729de860ea
 
 ## Install
